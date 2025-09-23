@@ -1,22 +1,34 @@
 package com.seuprojeto;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChannelListActivity extends AppCompatActivity implements ChannelAdapter.OnChannelClickListener {
 
@@ -24,27 +36,34 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
 
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private ChannelAdapter channelAdapter;
-    private List<Channel> channels = new ArrayList<>();
+    private CategoryAdapter categoryAdapter;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_channel_list); // Garanta que activity_channel_list.xml existe
+        setContentView(R.layout.activity_channel_list);
 
-        recyclerView = findViewById(R.id.channelRecyclerView); // Garanta que o RecyclerView tem este ID
-        progressBar = findViewById(R.id.progressBar); // Garanta que o ProgressBar tem este ID
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+        tabLayout = findViewById(R.id.tabLayout);
+        recyclerView = findViewById(R.id.channelRecyclerView);
+        progressBar = findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        channelAdapter = new ChannelAdapter(channels, this);
-        recyclerView.setAdapter(channelAdapter);
 
         Intent intent = getIntent();
         String playlistUrl = intent.getStringExtra("playlist_url");
-        String playlistName = intent.getStringExtra("playlist_full_name");
+        String playlistName = intent.getStringExtra("playlist_name");
 
-        setTitle(playlistName); // Define o título da Activity com o nome da playlist
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(playlistName);
+        }
 
+        loadChannels(playlistUrl);
+    }
+
+    private void loadChannels(String playlistUrl) {
         if (playlistUrl != null && !playlistUrl.isEmpty()) {
             progressBar.setVisibility(View.VISIBLE);
             new Thread(() -> {
@@ -53,85 +72,149 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
                     runOnUiThread(() -> {
                         progressBar.setVisibility(View.GONE);
                         if (fetchedChannels != null && !fetchedChannels.isEmpty()) {
-                            channels.clear();
-                            channels.addAll(fetchedChannels);
-                            channelAdapter.notifyDataSetChanged();
-                            Log.d(TAG, "Canais carregados: " + channels.size());
+                            processAndDisplayChannels(fetchedChannels);
                         } else {
-                            Toast.makeText(ChannelListActivity.this, "Nenhum canal encontrado na playlist.", Toast.LENGTH_LONG).show();
-                            Log.w(TAG, "Nenhum canal encontrado na playlist para URL: " + playlistUrl);
+                            Toast.makeText(this, "Nenhum canal encontrado na playlist.", Toast.LENGTH_LONG).show();
                         }
                     });
                 } catch (Exception e) {
-                    Log.e(TAG, "Erro ao carregar conteúdo M3U: " + e.getMessage(), e);
+                    Log.e(TAG, "Erro ao carregar M3U: " + e.getMessage(), e);
                     runOnUiThread(() -> {
                         progressBar.setVisibility(View.GONE);
-                        Toast.makeText(ChannelListActivity.this, "Erro ao carregar canais: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Erro ao carregar canais.", Toast.LENGTH_LONG).show();
                     });
                 }
             }).start();
-        } else {
-            Toast.makeText(this, "URL da playlist não fornecida.", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "URL da playlist é nula ou vazia.");
         }
+    }
+
+    private void processAndDisplayChannels(List<Channel> fetchedChannels) {
+        Map<String, List<Channel>> channelsByGroup = new LinkedHashMap<>();
+        for (Channel channel : fetchedChannels) {
+            String group = channel.getGroup();
+            if (group == null || group.trim().isEmpty()) {
+                group = "Outros";
+            }
+            List<Channel> groupList = channelsByGroup.get(group);
+            if (groupList == null) {
+                groupList = new ArrayList<>();
+                channelsByGroup.put(group, groupList);
+            }
+            groupList.add(channel);
+        }
+
+        List<ChannelCategory> categories = new ArrayList<>();
+        for (Map.Entry<String, List<Channel>> entry : channelsByGroup.entrySet()) {
+            categories.add(new ChannelCategory(entry.getKey(), entry.getValue()));
+        }
+
+        categoryAdapter = new CategoryAdapter(categories, this);
+        recyclerView.setAdapter(categoryAdapter);
+        
+        setupTabs(categories);
+    }
+
+    private void setupTabs(List<ChannelCategory> categories) {
+        tabLayout.removeOnTabSelectedListener(tabSelectedListener);
+        tabLayout.clearOnTabSelectedListeners();
+        tabLayout.removeAllTabs();
+
+        Set<String> mainCategories = new LinkedHashSet<>();
+        for (ChannelCategory category : categories) {
+            String title = category.getTitle().trim();
+            if (title.contains("|")) {
+                mainCategories.add(title.split("\\|")[0].trim());
+            } else {
+                mainCategories.add(title);
+            }
+        }
+
+        tabLayout.addTab(tabLayout.newTab().setText("Todos"));
+
+        for (String mainCategory : mainCategories) {
+            tabLayout.addTab(tabLayout.newTab().setText(mainCategory));
+        }
+
+        tabLayout.addOnTabSelectedListener(tabSelectedListener);
+    }
+
+    private final TabLayout.OnTabSelectedListener tabSelectedListener = new TabLayout.OnTabSelectedListener() {
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            if (categoryAdapter != null && tab.getText() != null) {
+                categoryAdapter.filterByCategory(tab.getText().toString());
+            }
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) { }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) { }
+    };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (categoryAdapter != null) {
+                    categoryAdapter.filter(newText);
+                }
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onChannelClick(Channel channel) {
+        Intent intent = new Intent(this, PlayerActivity.class);
+        intent.putExtra("channel_url", channel.getUrl());
+        intent.putExtra("channel_name", channel.getName());
+        startActivity(intent);
     }
 
     private List<Channel> downloadM3uContent(String m3uUrl) throws Exception {
         List<Channel> fetchedChannels = new ArrayList<>();
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
         try {
             URL url = new URL(m3uUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            int responseCode = urlConnection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String line;
-                String currentChannelName = null;
-
-                while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("#EXTINF:")) {
-                        // Extrai o nome do canal. A regex pode ser ajustada para maior precisão
-                        int commaIndex = line.indexOf(",");
-                        if (commaIndex != -1) {
-                            currentChannelName = line.substring(commaIndex + 1).trim();
-                        } else {
-                            currentChannelName = "Canal Desconhecido";
-                        }
-                    } else if (currentChannelName != null && !line.trim().isEmpty() && (line.startsWith("http://") || line.startsWith("https://"))) {
-                        // Se encontramos uma URL e já temos um nome, adicionamos o canal
-                        fetchedChannels.add(new Channel(currentChannelName, line.trim()));
-                        currentChannelName = null; // Reseta para o próximo canal
+            urlConnection.setRequestProperty("User-Agent", "IPTV Player/1.0");
+            reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            String currentChannelName = null, currentLogoUrl = null, currentGroup = null;
+            Pattern extinfPattern = Pattern.compile("#EXTINF:-1(?:\\s+tvg-id=\"(.*?)\")?(?:\\s+tvg-logo=\"(.*?)\")?(?:\\s+group-title=\"(.*?)\")?,(.*)");
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("#EXTINF:")) {
+                    Matcher matcher = extinfPattern.matcher(line);
+                    if (matcher.matches()) {
+                        currentLogoUrl = matcher.group(2);
+                        currentGroup = matcher.group(3);
+                        currentChannelName = matcher.group(4).trim();
                     }
+                } else if (currentChannelName != null && !line.trim().isEmpty() && (line.startsWith("http"))) {
+                    fetchedChannels.add(new Channel(currentChannelName, line.trim(), currentLogoUrl, currentGroup));
+                    currentChannelName = null;
+                    currentLogoUrl = null;
+                    // A LINHA INCORRETA FOI REMOVIDA DAQUI
+                    currentGroup = null;
                 }
-            } else {
-                throw new Exception("Falha na conexão: Código de resposta " + responseCode);
             }
         } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception e) {
-                    Log.e(TAG, "Erro ao fechar o reader: " + e.getMessage(), e);
-                }
-            }
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
+            if (reader != null) reader.close();
+            if (urlConnection != null) urlConnection.disconnect();
         }
         return fetchedChannels;
-    }
-
-    @Override
-    public void onChannelClick(Channel channel) {
-        Log.d(TAG, "Canal clicado: " + channel.getName() + " - URL: " + channel.getUrl());
-        Intent intent = new Intent(this, PlayerActivity.class);
-        intent.putExtra("channel_url", channel.getUrl());
-        intent.putExtra("channel_name", channel.getName());
-        startActivity(intent);
     }
 }
