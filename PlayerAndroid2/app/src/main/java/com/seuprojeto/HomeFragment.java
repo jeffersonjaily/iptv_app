@@ -24,15 +24,22 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HomeFragment extends Fragment implements PlaylistAdapter.OnPlaylistClickListener {
+public class HomeFragment extends Fragment implements ChannelAdapter.OnChannelClickListener {
 
     private static final String TAG = "HomeFragment";
     private static final String PLAYLIST_URL = "https://raw.githubusercontent.com/jeffersonjaily/iptv_app/main/PlayerAndroid2/app/src/main/assets/LISTA_IPTV.TXT";
 
     private RecyclerView recyclerView;
+    private ChannelAdapter channelAdapter;
+
+    public HomeFragment() {
+        // Required empty public constructor
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Infla o layout para este fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -42,34 +49,31 @@ public class HomeFragment extends Fragment implements PlaylistAdapter.OnPlaylist
 
         recyclerView = view.findViewById(R.id.homeRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        fetchPlaylists();
-    }
 
-    private void fetchPlaylists() {
+        // Carrega a lista da URL em uma thread separada
         new Thread(() -> {
             try {
                 List<Channel> playlists = fetchPlaylistsFromUrl(PLAYLIST_URL);
-                if (getActivity() == null) return;
 
-                if (!playlists.isEmpty()) {
-                    Log.d(TAG, "Playlists carregadas com sucesso: " + playlists.size());
+                if (getActivity() != null && playlists != null && !playlists.isEmpty()) {
+                    Log.d(TAG, "Playlists carregadas: " + playlists.size());
+                    // AGORA SIM: Atualiza a UI com os dados carregados
                     getActivity().runOnUiThread(() -> {
-                        PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlists, this);
-                        recyclerView.setAdapter(playlistAdapter);
+                        channelAdapter = new ChannelAdapter(playlists, this);
+                        recyclerView.setAdapter(channelAdapter);
                     });
                 } else {
-                    Log.w(TAG, "Nenhuma playlist encontrada no servidor (verifique o formato do arquivo).");
-                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Nenhuma playlist encontrada no servidor.", Toast.LENGTH_LONG).show());
+                    Log.w(TAG, "A lista de playlists da URL está vazia.");
                 }
+
             } catch (IOException e) {
-                Log.e(TAG, "Erro de rede ao carregar playlists: " + e.getMessage(), e);
-                if (getActivity() == null) return;
-                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Erro de rede. Verifique sua conexão.", Toast.LENGTH_LONG).show());
+                Log.e(TAG, "Erro de I/O ao carregar lista: " + e.getMessage(), e);
             }
         }).start();
     }
 
     private List<Channel> fetchPlaylistsFromUrl(String urlString) throws IOException {
+        // O método de busca que estava na MainActivity agora está aqui
         List<Channel> playlists = new ArrayList<>();
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -77,31 +81,34 @@ public class HomeFragment extends Fragment implements PlaylistAdapter.OnPlaylist
         try {
             URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("User-Agent", "IPTV Player/1.0");
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
             reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-
             String line;
-            String currentName = null;
-            String currentUrl = null;
 
-            Pattern namePattern = Pattern.compile("^Nome:\\s*(.*)");
-            Pattern urlPattern = Pattern.compile("^Link M3U:\\s*(.*)");
+            Pattern pattern = Pattern.compile("Link M3U: (https?://\\S+)");
+            Pattern namePattern = Pattern.compile("Servidor ➤\\s*(http[s]?://[^:]+:[^\\s]+)");
+            String currentName = null;
 
             while ((line = reader.readLine()) != null) {
                 Matcher nameMatcher = namePattern.matcher(line);
-                if (nameMatcher.matches()) {
-                    currentName = nameMatcher.group(1).trim();
+                if (nameMatcher.find()) {
+                    currentName = nameMatcher.group(1);
+                    if (currentName.contains(":")) {
+                        currentName = currentName.substring(0, currentName.indexOf(":"));
+                    }
+                    currentName = currentName.replace("http://", "").replace("https://", "").trim();
+                    currentName = "Playlist - " + currentName;
                 }
 
-                Matcher urlMatcher = urlPattern.matcher(line);
-                if (urlMatcher.matches()) {
-                    currentUrl = urlMatcher.group(1).trim();
-                }
-
-                if (currentName != null && currentUrl != null) {
-                    playlists.add(new Channel(currentName, currentUrl));
-                    currentName = null;
-                    currentUrl = null;
+                Matcher urlMatcher = pattern.matcher(line);
+                if (urlMatcher.find()) {
+                    String m3uUrl = urlMatcher.group(1).trim();
+                    if (currentName != null) {
+                        playlists.add(new Channel(currentName, m3uUrl));
+                        currentName = null;
+                    }
                 }
             }
         } finally {
@@ -111,10 +118,10 @@ public class HomeFragment extends Fragment implements PlaylistAdapter.OnPlaylist
         return playlists;
     }
 
+    // O clique agora é tratado aqui, no Fragment
     @Override
-    public void onPlaylistClick(Channel playlist) {
-        if (getActivity() == null) return;
-        
+    public void onChannelClick(Channel playlist) {
+        Log.d(TAG, "Playlist clicada: " + playlist.getName() + " - URL: " + playlist.getUrl());
         Intent intent = new Intent(getActivity(), ChannelListActivity.class);
         intent.putExtra("playlist_url", playlist.getUrl());
         intent.putExtra("playlist_name", playlist.getName());
