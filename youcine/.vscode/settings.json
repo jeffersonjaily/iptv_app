@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.project.sourcePaths": [
+        "test-java/PlayerJava/src/main",
+        "PlayerJava/src/main/java/com/seuprojeto"
+    ]
+}

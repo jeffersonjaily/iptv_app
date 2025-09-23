@@ -1,0 +1,29 @@
+/* ==================================== */
+/* Estilo da Barra de Menu (MenuBar)    */
+/* ==================================== */
+.menu-bar {
+    -fx-background-color: -background-color;
+    -fx-border-color: -primary-color;
+    -fx-border-width: 0 0 2px 0;
+}
+
+/* ==================================== */
+/* Estilo dos Menus e Itens             */
+/* ==================================== */
+.menu {
+    -fx-text-fill: -text-color;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-text-fill: -text-color;
+    -fx-background-color: transparent;
+}
+
+.menu-item:hover {
+    -fx-background-color: black;
+
+.menu-item:focused {
+    -fx-background-color: -pressed-color;
+}

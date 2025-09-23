@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "837741161739",
+    "project_id": "tabela-de-gasto-familiar",
+    "storage_bucket": "tabela-de-gasto-familiar.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837741161739:android:f97ce9edf23173569cc60e",
+        "android_client_info": {
+          "package_name": "com.seuprojeto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0hL737PxgLCjpT7JH-jHPVg0hEkH8xv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
