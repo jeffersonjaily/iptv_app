@@ -1,16 +1,22 @@
-Servidor: kinder5.live:80
-Usuário: 707434249
-Senha: 697551514
-Vencimento: 19/01/2025
-Conexões Máximas: 1
-Conexões Ativas: 0
-Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus
-------------------------------
 
-Servidor: kinder5.live:80
-Usuário: 707434249
-Senha: 697551514
-Vencimento: 12/09/2025
-Conexões Máximas: 1
-Conexões Ativas: 0
+Nome: Servidor Kinder5 - User 707434249
 Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User 367441541
+Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User ednamaria
+Link M3U: http://felas87dz.icu:80/get.php?username=ednamaria&password=366242934&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User Diego01
+Link M3U: http://felas87dz.icu:80/get.php?username=Diego01&password=9518484&type=m3u_plus
+---
+Nome: Nova Lista TV Aberta
+Link M3U: http://bit.do/tvab
+---
+Nome: IPTV BRZ
+Link M3U: http://is.gd/iptvbrz
+---
+Nome: IPTV Brasil
+Link M3U: http://bit.ly/IptvBrasil
+---

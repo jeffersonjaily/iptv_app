@@ -77,7 +77,7 @@ public class PlayerActivity extends AppCompatActivity {
                 player.play();
             } catch (Exception e) {
                 Log.e(TAG, "URL inválida: " + channelUrl, e);
-                Toast.makeText(this, "URL inválida.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "URL invalid.", Toast.LENGTH_LONG).show();
                 finish();
                 return;
             }

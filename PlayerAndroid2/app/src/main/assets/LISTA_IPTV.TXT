@@ -1,35 +1,19 @@
-Servidor ➤ http://kinder5.live:80  
-├ Usuário ➤ 707434249  
-├ Senha ➤ 697551514  
-├ Vencimento ➤ 19/01/2025  
-├ Conexões Máximas ➤ 1  
-├ Conexões Ativas ➤ 0  
-├ Link M3U ➤ http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus  
 
 
- ▬▬ஜ۩  t.me/jogosapkmod ۩ஜ▬▬ 
- 🔰Nosso Grupo No Telegram 🔰 
-  📂Servidor ➤ http://kinder5.live:80 
-  👤 Usuário ➤ 707434249 
-  🔑  Senha ➤ 697551514 
-  📂Vencimento ➤ 12/09/2025 
-  📂 Conexões Máximas ➤ 1 
-  📂 Conexões Ativas ➤ 0 
-  🔰Lista iptv m3u 🔰 
-  ─ 📂Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus 
-
-
-▬▬ஜ۩  t.me/jogosapkmod ۩ஜ▬▬ 
- 🔰Nosso Grupo No Telegram 🔰 
-  📂Servidor ➤ http://felas87dz.icu:80 
-  👤 Usuário ➤ 367441541 
-  🔑  Senha ➤ 739444665 
-  📂Vencimento ➤ 19/01/2038 
-  📂 Conexões Máximas ➤ 1 
-  📂 Conexões Ativas ➤ 0 
-  🔰Lista iptv m3u 🔰 
-  ─ 📂Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus 
-
+Nome: Servidor Kinder5 - User 707434249
+Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User 367441541
+Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User ednamaria
+Link M3U: http://felas87dz.icu:80/get.php?username=ednamaria&password=366242934&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User Anonymous100
+Link M3U: http://felas87dz.icu:80/get.php?username=Anonymous100&password=Hacker100&type=m3u_plus
+---
+Nome: Servidor Felas87dz - User 854191413
+Link M3U: http://felas87dz.icu:80/get.php?username=854191413&password=383942274&type=m3u_plus
 
  ▬▬ஜ۩  t.me/jogosapkmod ۩ஜ▬▬ 
  🔰Nosso Grupo No Telegram 🔰 
