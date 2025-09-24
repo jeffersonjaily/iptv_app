@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder> {
@@ -34,6 +35,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Channel currentPlaylist = playlist.get(position);
         holder.nameTextView.setText(currentPlaylist.getName());
+
+        Glide.with(holder.itemView.getContext())
+                .load(R.drawable.ic_movie)
+                .into(holder.iconImageView);
+
+        // --- LÓGICA DO CLIQUE MOVIDA PARA CÁ ---
+        // Este é o local correto, pois temos acesso à 'position' e ao 'listener'.
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onPlaylistClick(currentPlaylist);
+            }
+        });
     }
 
     @Override
@@ -42,18 +55,15 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     }
 
     public static class PlaylistViewHolder extends RecyclerView.ViewHolder {
+        ImageView iconImageView;
         TextView nameTextView;
 
         public PlaylistViewHolder(@NonNull View itemView) {
             super(itemView);
+            iconImageView = itemView.findViewById(R.id.channelImageView);
             nameTextView = itemView.findViewById(R.id.channelNameTextView);
-
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onPlaylistClick(playlist.get(position));
-                }
-            });
+            
+            // A lógica de clique foi removida daqui.
         }
     }
 }
