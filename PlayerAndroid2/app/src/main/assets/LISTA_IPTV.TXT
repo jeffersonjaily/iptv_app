@@ -1,11 +1,13 @@
-
-Nome: Canais-ao-vivo-1 - User 155846650
-Link M3U: http://felas87dz.icu:80/get.php?username=155846650&password=817126985&type=m3u_plus
+Nome: Series-Filmes- tem que Pesquisar
+http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus 
 ---
-Nome:  Canais-ao-vivo-2- User 367441541
+Nome: Canais-ao-vivo
+Link M3U: http://felas87dz.icu:80/get.php?username=155846650&password=817126985&type=m3u_plus
+
+Nome:  Canais e Seris-Filmes Pesquisar
 Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus
 ---
-Nome: Canais-ao-vivo-3- User Diego01
+Nome: Canais-ao-vivo-2- User Diego01
 Link M3U: http://felas87dz.icu:80/get.php?username=Diego01&password=9518484&type=m3u_plus
 ---
 Nome: Servidor felas87dz.icu - User ednamaria
@@ -104,9 +106,6 @@ Link M3U: http://xp.pxfrat.lat:80/get.php?username=5emaqvob&password=ah5tgm6f&ty
 Nome: Servidor xp.pxfrat.lat - User vera2873806
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=vera2873806&password=2873806Va&type=m3u_plus
 ---
-Nome: Servidor xp.pxfrat.lat - User marceloquarto
-Link M3U: http://xp.pxfrat.lat:80/get.php?username=marceloquarto&password=Z927Z633&type=m3u_plus
----
 Nome: Servidor xp.pxfrat.lat - User lari14395255
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=lari14395255&password=la71969078&type=m3u_plus
 ---
@@ -137,19 +136,13 @@ Link M3U: http://xp.pxfrat.lat:80/get.php?username=gbwaqbqe&password=Q17zadYu62&
 Nome: Servidor xp.pxfrat.lat - User orlando3739
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=orlando3739&password=9378595&type=m3u_plus
 ---
-Nome: Servidor xp.pxfrat.lat - User 40168611
-Link M3U: http://xp.pxfrat.lat:80/get.php?username=40168611&password=47348103&type=m3u_plus
----
 Nome: Servidor xp.pxfrat.lat - User 8QLBR98XB
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=8QLBR98XB&password=10641N1V&type=m3u_plus
 ---
 Nome: Servidor xp.pxfrat.lat - User valter2024k
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=valter2024k&password=20194764&type=m3u_plus
 ---
-Nome: Servidor xp.pxfrat.lat - User CJ6i2tXF
-Link M3U: http://xp.pxfrat.lat:80/get.php?username=CJ6i2tXF&password=RWjMdwEc&type=m3u_plus
----
-Nome: Servidor xp.pxfrat.lat - User emersonfilipi
+Nome: Canais 24h emersonfilipi
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=emersonfilipi&password=82993892311&type=m3u_plus
 ---
 Nome: Lista Grátis - TVAB

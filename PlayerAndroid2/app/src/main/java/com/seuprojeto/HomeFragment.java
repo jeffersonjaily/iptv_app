@@ -71,6 +71,7 @@ public class HomeFragment extends Fragment implements PlaylistAdapter.OnPlaylist
         try {
             URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("User-Agent", "IPTV Player/1.0");
             reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line;
             String currentName = null;

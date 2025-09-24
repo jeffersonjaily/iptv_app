@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 public class ChannelListActivity extends AppCompatActivity implements ChannelAdapter.OnChannelClickListener {
 
     private static final String TAG = "ChannelListActivity";
-
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private CategoryAdapter categoryAdapter;
@@ -44,14 +43,17 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_channel_list);
 
+        // Configura a Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Inicializa as Views
         tabLayout = findViewById(R.id.tabLayout);
         recyclerView = findViewById(R.id.channelRecyclerView);
         progressBar = findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Pega os dados passados da tela anterior
         Intent intent = getIntent();
         String playlistUrl = intent.getStringExtra("playlist_url");
         String playlistName = intent.getStringExtra("playlist_name");
@@ -60,9 +62,13 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
             getSupportActionBar().setTitle(playlistName);
         }
 
+        // Inicia o carregamento dos canais
         loadChannels(playlistUrl);
     }
 
+    /**
+     * Inicia uma thread para baixar o conteúdo da playlist da URL fornecida.
+     */
     private void loadChannels(String playlistUrl) {
         if (playlistUrl != null && !playlistUrl.isEmpty()) {
             progressBar.setVisibility(View.VISIBLE);
@@ -88,6 +94,9 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         }
     }
 
+    /**
+     * Agrupa os canais por categoria e os exibe na tela.
+     */
     private void processAndDisplayChannels(List<Channel> fetchedChannels) {
         Map<String, List<Channel>> channelsByGroup = new LinkedHashMap<>();
         for (Channel channel : fetchedChannels) {
@@ -95,12 +104,8 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
             if (group == null || group.trim().isEmpty()) {
                 group = "Outros";
             }
-            List<Channel> groupList = channelsByGroup.get(group);
-            if (groupList == null) {
-                groupList = new ArrayList<>();
-                channelsByGroup.put(group, groupList);
-            }
-            groupList.add(channel);
+            // Adiciona o canal à lista de seu grupo
+            channelsByGroup.computeIfAbsent(group, k -> new ArrayList<>()).add(channel);
         }
 
         List<ChannelCategory> categories = new ArrayList<>();
@@ -114,9 +119,11 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         setupTabs(categories);
     }
 
+    /**
+     * Configura as abas (Tabs) com as categorias principais dos canais.
+     */
     private void setupTabs(List<ChannelCategory> categories) {
         tabLayout.removeOnTabSelectedListener(tabSelectedListener);
-        tabLayout.clearOnTabSelectedListeners();
         tabLayout.removeAllTabs();
 
         Set<String> mainCategories = new LinkedHashSet<>();
@@ -143,10 +150,8 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
                 categoryAdapter.filterByCategory(tab.getText().toString());
             }
         }
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) { }
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) { }
+        @Override public void onTabUnselected(TabLayout.Tab tab) { }
+        @Override public void onTabReselected(TabLayout.Tab tab) { }
     };
 
     @Override
@@ -155,8 +160,7 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) { return false; }
+            @Override public boolean onQueryTextSubmit(String query) { return false; }
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -169,45 +173,42 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         return super.onCreateOptionsMenu(menu);
     }
 
-    // --- ESTA É A VERSÃO CORRETA DA LÓGICA DE CLIQUE, AGORA DENTRO DA CLASSE ---
+    /**
+     * Chamado quando um canal é clicado. Envia a lista de canais da categoria
+     * e a posição do canal clicado para a PlayerActivity.
+     */
     @Override
     public void onChannelClick(Channel channel) {
-        ArrayList<Channel> channelList = new ArrayList<>();
-        int clickedIndex = -1;
-
-        // Procura a categoria correspondente e a lista de canais dela
-        for (ChannelCategory category : categoryAdapter.getCategoryList()) {
-            if (category.getChannels().contains(channel)) {
-                channelList.addAll(category.getChannels());
-                break;
+        ArrayList<Channel> channelListInCategory = new ArrayList<>();
+        if (categoryAdapter != null) {
+            for (ChannelCategory category : categoryAdapter.getCategoryList()) {
+                if (category.getChannels().contains(channel)) {
+                    channelListInCategory.addAll(category.getChannels());
+                    break;
+                }
             }
         }
 
-        // Encontra o índice exato do canal clicado dentro da lista
-        for (int i = 0; i < channelList.size(); i++) {
-            // Compara por URL para garantir, pois objetos podem ser diferentes
-            if (channelList.get(i).getUrl().equals(channel.getUrl())) {
-                clickedIndex = i;
-                break;
-            }
-        }
-
-        if (!channelList.isEmpty() && clickedIndex != -1) {
-            Log.d(TAG, "Iniciando player com " + channelList.size() + " canais. Posição inicial: " + clickedIndex);
+        int clickedIndex = channelListInCategory.indexOf(channel);
+        if (!channelListInCategory.isEmpty() && clickedIndex != -1) {
             Intent intent = new Intent(this, PlayerActivity.class);
-            intent.putExtra("channel_list", channelList);
+            intent.putExtra("channel_list", channelListInCategory);
             intent.putExtra("start_position", clickedIndex);
             startActivity(intent);
         } else {
-             Log.e(TAG, "Não foi possível encontrar o canal clicado na lista da categoria.");
-             // Fallback para o método antigo caso algo dê errado
-             Intent intent = new Intent(this, PlayerActivity.class);
-             intent.putExtra("channel_list", new ArrayList<Channel>(){{ add(channel); }});
-             intent.putExtra("start_position", 0);
-             startActivity(intent);
+            // Fallback: se não encontrar a categoria, envia apenas o canal clicado
+            ArrayList<Channel> singleChannelList = new ArrayList<>();
+            singleChannelList.add(channel);
+            Intent intent = new Intent(this, PlayerActivity.class);
+            intent.putExtra("channel_list", singleChannelList);
+            intent.putExtra("start_position", 0);
+            startActivity(intent);
         }
     }
 
+    /**
+     * Faz o parsing do arquivo M3U para extrair os canais.
+     */
     private List<Channel> downloadM3uContent(String m3uUrl) throws Exception {
         List<Channel> fetchedChannels = new ArrayList<>();
         HttpURLConnection urlConnection = null;
@@ -228,7 +229,7 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
                         currentGroup = matcher.group(3);
                         currentChannelName = matcher.group(4).trim();
                     }
-                } else if (currentChannelName != null && !line.trim().isEmpty() && (line.startsWith("http"))) {
+                } else if (currentChannelName != null && !line.trim().isEmpty() && line.startsWith("http")) {
                     fetchedChannels.add(new Channel(currentChannelName, line.trim(), currentLogoUrl, currentGroup));
                     currentChannelName = null;
                     currentLogoUrl = null;

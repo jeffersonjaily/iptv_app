@@ -16,20 +16,19 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            // A lógica de filtro para Filmes/Séries/Ao Vivo precisará ser adaptada
-            // para carregar uma lista específica ou filtrar após o carregamento.
-            // Por enquanto, vamos focar em fazer a Home funcionar perfeitamente.
+            // No futuro, podemos fazer os outros botões carregarem listas específicas
+            // mas a arquitetura de carregar sob demanda será mantida.
 
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
 
+            // Por enquanto, apenas o botão Home é o principal
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
             } else {
-                // Para os outros botões, podemos criar um HomeFragment com uma URL de lista diferente
-                // ou implementar a lógica de filtro na próxima tela.
-                // Por enquanto, eles podem recarregar a home ou não fazer nada.
-                selectedFragment = new HomeFragment(); // Temporariamente, todos carregam a home
+                // Podemos adicionar a lógica para os outros botões depois
+                // Temporariamente, eles podem carregar a Home também ou mostrar uma mensagem.
+                selectedFragment = new HomeFragment();
             }
 
             if (selectedFragment != null) {

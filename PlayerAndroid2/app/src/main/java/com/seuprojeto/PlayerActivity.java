@@ -1,9 +1,7 @@
 package com.seuprojeto;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -21,15 +19,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends AppCompatActivity implements PlayerOvelayListener, PlayerCategoryAdapter.OnCategoryClickListener {
 
     private PlayerView playerView;
     private ExoPlayer player;
     private ProgressBar progressBar;
+    private RecyclerView rvCategoriesOverlay;
     private RecyclerView rvChannelsOverlay;
+    private View overlayPanel;
+    private PlayerCategoryAdapter categoryAdapter;
+    private PlaylistAdapter channelAdapter;
 
-    private ArrayList<Channel> channelList;
+    private ArrayList<Channel> allChannels;
+    private List<String> categoryNames;
     private int startPosition;
 
     @Override
@@ -38,58 +42,55 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        channelList = (ArrayList<Channel>) getIntent().getSerializableExtra("channel_list");
+        allChannels = (ArrayList<Channel>) getIntent().getSerializableExtra("channel_list");
         startPosition = getIntent().getIntExtra("start_position", 0);
 
         playerView = findViewById(R.id.playerView);
         progressBar = findViewById(R.id.progressBar);
+        overlayPanel = findViewById(R.id.overlay_panel);
+        rvCategoriesOverlay = findViewById(R.id.rvCategoriesOverlay);
         rvChannelsOverlay = findViewById(R.id.rvChannelsOverlay);
 
         hideSystemUI();
-
-        // --- MUDANÇA: Removemos o ControllerVisibilityListener ---
-    }
-    
-    // NOVO MÉTODO: Controla a visibilidade da lista de canais
-    private void toggleChannelOverlay() {
-        if (rvChannelsOverlay.getVisibility() == View.VISIBLE) {
-            rvChannelsOverlay.setVisibility(View.GONE);
-            playerView.hideController(); // Opcional: esconde os controles junto
-        } else {
-            rvChannelsOverlay.setVisibility(View.VISIBLE);
-            // Centraliza a lista no canal que está tocando
-            rvChannelsOverlay.scrollToPosition(player.getCurrentMediaItemIndex());
-        }
     }
 
-    // NOVO MÉTODO: Captura os cliques do controle remoto
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        // Se o usuário apertar "OK" (DPAD_CENTER) ou "CIMA"/"BAIXO"
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_CENTER:
-                case KeyEvent.KEYCODE_ENTER:
-                    toggleChannelOverlay();
-                    return true; // Evento consumido, não passa adiante
-                case KeyEvent.KEYCODE_DPAD_UP:
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                    // Se a lista estiver visível, permite navegar nela
-                    if (rvChannelsOverlay.getVisibility() == View.VISIBLE) {
-                        return rvChannelsOverlay.dispatchKeyEvent(event);
-                    }
-                    break;
-            }
+    public void onToggleOverlay() {
+        if (overlayPanel.getVisibility() == View.VISIBLE) {
+            overlayPanel.setVisibility(View.GONE);
+        } else {
+            overlayPanel.setVisibility(View.VISIBLE);
+            updateOverlayLists();
         }
-        return super.dispatchKeyEvent(event);
     }
-    
-    // ... (O resto da sua classe onStart, onStop, etc., continua igual, com as devidas importações)
+
+    @Override
+    public void onCategoryClick(String category, int position) {
+        categoryAdapter.setSelectedPosition(position);
+        List<Channel> filteredChannels;
+
+        if (category.equalsIgnoreCase("TODOS")) {
+            filteredChannels = new ArrayList<>(allChannels);
+        } else {
+            filteredChannels = allChannels.stream()
+                .filter(c -> category.equals(c.getGroup()))
+                .collect(Collectors.toList());
+        }
+
+        channelAdapter = new PlaylistAdapter(filteredChannels, clickedChannel -> {
+            int globalIndex = allChannels.indexOf(clickedChannel);
+            if (globalIndex != -1) {
+                player.seekTo(globalIndex, 0);
+                overlayPanel.setVisibility(View.GONE);
+            }
+        });
+        rvChannelsOverlay.setAdapter(channelAdapter);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        if (channelList != null && !channelList.isEmpty()) {
+        if (allChannels != null && !allChannels.isEmpty()) {
             initializePlayer();
             setupChannelOverlay();
         } else {
@@ -109,22 +110,24 @@ public class PlayerActivity extends AppCompatActivity {
             player = new ExoPlayer.Builder(this).build();
             playerView.setPlayer(player);
 
+            CustomPlayerControlView controlView = playerView.findViewById(R.id.custom_controls);
+            if (controlView != null) {
+                controlView.setOverlayListener(this);
+            }
+
             List<MediaItem> mediaItems = new ArrayList<>();
-            for (Channel channel : channelList) {
+            for (Channel channel : allChannels) {
                 mediaItems.add(MediaItem.fromUri(Uri.parse(channel.getUrl())));
             }
             player.setMediaItems(mediaItems);
-
             player.seekTo(startPosition, 0);
             player.prepare();
             player.play();
-
             player.addListener(new Player.Listener() {
                 @Override
                 public void onPlaybackStateChanged(int state) {
                     progressBar.setVisibility(state == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
                 }
-
                 @Override
                 public void onPlayerError(@NonNull PlaybackException error) {
                      Toast.makeText(PlayerActivity.this, "Erro ao reproduzir o canal.", Toast.LENGTH_LONG).show();
@@ -134,17 +137,46 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setupChannelOverlay() {
+        categoryNames = allChannels.stream()
+            .map(c -> c.getGroup() == null ? "Outros" : c.getGroup())
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+        categoryNames.add(0, "TODOS");
+
+        rvCategoriesOverlay.setLayoutManager(new LinearLayoutManager(this));
+        categoryAdapter = new PlayerCategoryAdapter(categoryNames, this);
+        rvCategoriesOverlay.setAdapter(categoryAdapter);
+        
         rvChannelsOverlay.setLayoutManager(new LinearLayoutManager(this));
-        PlaylistAdapter overlayAdapter = new PlaylistAdapter(channelList, clickedChannel -> {
-            int clickedIndex = channelList.indexOf(clickedChannel);
-            if (clickedIndex != -1) {
-                player.seekTo(clickedIndex, 0);
-                // Esconde a lista após selecionar um novo canal
-                rvChannelsOverlay.setVisibility(View.GONE);
+    }
+
+    private void updateOverlayLists() {
+        if (player == null) return;
+        
+        int currentChannelIndex = player.getCurrentMediaItemIndex();
+        Channel currentChannel = allChannels.get(currentChannelIndex);
+        String currentGroup = currentChannel.getGroup() == null ? "Outros" : currentChannel.getGroup();
+        int categoryPosition = categoryNames.indexOf(currentGroup);
+
+        if(categoryPosition != -1) {
+            rvCategoriesOverlay.scrollToPosition(categoryPosition);
+            onCategoryClick(currentGroup, categoryPosition);
+        } else {
+            rvCategoriesOverlay.scrollToPosition(0);
+            onCategoryClick("TODOS", 0);
+        }
+        
+        rvChannelsOverlay.post(() -> {
+            if (rvChannelsOverlay.getAdapter() != null) {
+                PlaylistAdapter adapter = (PlaylistAdapter) rvChannelsOverlay.getAdapter();
+                List<Channel> filteredChannels = adapter.getChannels();
+                int indexInFilteredList = filteredChannels.indexOf(currentChannel);
+                if (indexInFilteredList != -1) {
+                    rvChannelsOverlay.scrollToPosition(indexInFilteredList);
+                }
             }
         });
-        rvChannelsOverlay.setAdapter(overlayAdapter);
-        rvChannelsOverlay.scrollToPosition(startPosition);
     }
 
     private void releasePlayer() {

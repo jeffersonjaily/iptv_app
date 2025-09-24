@@ -6,10 +6,14 @@
     android:layout_width="120dp"
     android:layout_height="170dp"
     android:layout_margin="6dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:clickable="true"
+
     android:focusable="true"
+    android:clickable="true"
+    app:strokeWidth="6dp"
+    app:strokeColor="@color/card_stroke_color_selector"
+    
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
     android:foreground="?attr/selectableItemBackground">
 
     <FrameLayout
@@ -40,7 +44,7 @@
             android:textSize="14sp"
             android:maxLines="2"
             android:ellipsize="end"
-            tools:text="Nome do Canal de TV Bem Longo" />
+            tools:text="Nome do Canal" />
 
     </FrameLayout>
 

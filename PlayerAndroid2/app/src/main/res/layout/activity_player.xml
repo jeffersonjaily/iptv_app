@@ -11,9 +11,7 @@
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:use_controller="true"
-        app:hide_on_touch="true"
-        app:shutter_background_color="@color/background" />
+        app:controller_layout_id="@layout/custom_player_controls" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -22,14 +20,27 @@
         android:layout_gravity="center"
         android:visibility="gone" />
         
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChannelsOverlay"
-        android:layout_width="300dp"
+    <LinearLayout
+        android:id="@+id/overlay_panel"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:orientation="horizontal"
         android:layout_gravity="start"
-        android:background="#A0000000"
+        android:background="#D0000000"
         android:visibility="gone"
-        tools:visibility="visible"
-        tools:listitem="@layout/item_channel" />
+        tools:visibility="visible">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCategoriesOverlay"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:background="#80000000" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChannelsOverlay"
+            android:layout_width="350dp"
+            android:layout_height="match_parent" />
+            
+    </LinearLayout>
 
 </FrameLayout>

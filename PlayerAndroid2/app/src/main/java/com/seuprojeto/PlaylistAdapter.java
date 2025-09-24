@@ -23,6 +23,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         this.playlist = playlist;
         this.listener = listener;
     }
+    
+    // Método adicionado para obter a lista de canais
+    public List<Channel> getChannels() {
+        return this.playlist;
+    }
 
     @NonNull
     @Override
@@ -37,11 +42,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         holder.nameTextView.setText(currentPlaylist.getName());
 
         Glide.with(holder.itemView.getContext())
-                .load(R.drawable.ic_movie)
+                .load(R.drawable.ic_movie) // Carrega um ícone padrão, o que é correto para a lista de playlists
                 .into(holder.iconImageView);
 
-        // --- LÓGICA DO CLIQUE MOVIDA PARA CÁ ---
-        // Este é o local correto, pois temos acesso à 'position' e ao 'listener'.
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onPlaylistClick(currentPlaylist);
@@ -62,8 +65,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             super(itemView);
             iconImageView = itemView.findViewById(R.id.channelImageView);
             nameTextView = itemView.findViewById(R.id.channelNameTextView);
-            
-            // A lógica de clique foi removida daqui.
         }
     }
 }
