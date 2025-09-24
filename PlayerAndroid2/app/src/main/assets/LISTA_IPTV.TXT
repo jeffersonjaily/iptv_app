@@ -1,9 +1,12 @@
 
-Nome: Servidor canais-ao-vivo-1 - User 707434249
-Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus
+Nome: Canais-ao-vivo-1 - User 155846650
+Link M3U: http://felas87dz.icu:80/get.php?username=155846650&password=817126985&type=m3u_plus
 ---
-Nome: Servidor canais-ao-vivo-2- User 367441541
+Nome:  Canais-ao-vivo-2- User 367441541
 Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus
+---
+Nome: Canais-ao-vivo-3- User Diego01
+Link M3U: http://felas87dz.icu:80/get.php?username=Diego01&password=9518484&type=m3u_plus
 ---
 Nome: Servidor felas87dz.icu - User ednamaria
 Link M3U: http://felas87dz.icu:80/get.php?username=ednamaria&password=366242934&type=m3u_plus
@@ -22,9 +25,6 @@ Link M3U: http://felas87dz.icu:80/get.php?username=877436571&password=518461483&
 ---
 Nome: Servidor felas87dz.icu - User 914816154
 Link M3U: http://felas87dz.icu:80/get.php?username=914816154&password=284666750&type=m3u_plus
----
-Nome: Servidor felas87dz.icu - User Diego01
-Link M3U: http://felas87dz.icu:80/get.php?username=Diego01&password=9518484&type=m3u_plus
 ---
 Nome: Servidor felas87dz.icu - User zulena
 Link M3U: http://felas87dz.icu:80/get.php?username=zulena&password=zulenaa&type=m3u_plus
