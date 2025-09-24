@@ -34,7 +34,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         ChannelCategory category = categoryList.get(position);
         holder.categoryTitle.setText(category.getTitle());
 
-        // Configura a RecyclerView horizontal (o carrossel de canais)
         holder.channelsRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         ChannelAdapter channelAdapter = new ChannelAdapter(category.getChannels(), channelClickListener);
         holder.channelsRecyclerView.setAdapter(channelAdapter);
@@ -45,7 +44,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         return categoryList.size();
     }
 
-    // Método de filtro para a busca por texto
     public void filter(String text) {
         categoryList.clear();
         if (text.isEmpty()) {
@@ -67,7 +65,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         notifyDataSetChanged();
     }
 
-    // Método para filtrar pelas abas de categoria
     public void filterByCategory(String mainCategory) {
         categoryList.clear();
         if (mainCategory.equalsIgnoreCase("Todos")) {
@@ -81,6 +78,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         }
         notifyDataSetChanged();
     }
+
+    // --- MÉTODO FALTANTE ADICIONADO AQUI ---
+    public List<ChannelCategory> getCategoryList() {
+        // Retorna a lista original para garantir que temos todos os canais para passar para o player
+        return originalCategoryList;
+    }
+    // ------------------------------------
 
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView categoryTitle;

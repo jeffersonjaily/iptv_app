@@ -1,14 +1,8 @@
-Entendido. Processei todo o seu arquivo de 739 linhas e converti todas as listas válidas para o formato correto que o aplicativo consegue ler.
 
-Eu extraí o "Servidor", "Usuário" e "Link M3U" de cada bloco e criei um nome único para cada lista. Listas que não tinham um link M3U claro ou que eram apenas informativas (como links de Telegram) foram ignoradas.
-
-Arquivo LISTA_IPTV.TXT (Versão Completa e Corrigida)
-Ação: Copie o texto abaixo e substitua todo o conteúdo do seu arquivo LISTA_IPTV.TXT no GitHub por ele.
-
-Nome: Servidor kinder5.live - User 707434249
+Nome: Servidor canais-ao-vivo-1 - User 707434249
 Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus
 ---
-Nome: Servidor felas87dz.icu - User 367441541
+Nome: Servidor canais-ao-vivo-2- User 367441541
 Link M3U: http://felas87dz.icu:80/get.php?username=367441541&password=739444665&type=m3u_plus
 ---
 Nome: Servidor felas87dz.icu - User ednamaria
@@ -154,9 +148,6 @@ Link M3U: http://xp.pxfrat.lat:80/get.php?username=valter2024k&password=20194764
 ---
 Nome: Servidor xp.pxfrat.lat - User CJ6i2tXF
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=CJ6i2tXF&password=RWjMdwEc&type=m3u_plus
----
-Nome: Servidor xp.pxfrat.lat - User bxoyjifq
-Link M3U: http://xp.pxfrat.lat:80/get.php?username=bxoyjifq&password=63MirpZd91&type=m3u_plus
 ---
 Nome: Servidor xp.pxfrat.lat - User emersonfilipi
 Link M3U: http://xp.pxfrat.lat:80/get.php?username=emersonfilipi&password=82993892311&type=m3u_plus

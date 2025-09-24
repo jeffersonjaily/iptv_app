@@ -130,11 +130,9 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         }
 
         tabLayout.addTab(tabLayout.newTab().setText("Todos"));
-
         for (String mainCategory : mainCategories) {
             tabLayout.addTab(tabLayout.newTab().setText(mainCategory));
         }
-
         tabLayout.addOnTabSelectedListener(tabSelectedListener);
     }
 
@@ -145,10 +143,8 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
                 categoryAdapter.filterByCategory(tab.getText().toString());
             }
         }
-
         @Override
         public void onTabUnselected(TabLayout.Tab tab) { }
-
         @Override
         public void onTabReselected(TabLayout.Tab tab) { }
     };
@@ -160,9 +156,7 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+            public boolean onQueryTextSubmit(String query) { return false; }
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -175,12 +169,43 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
         return super.onCreateOptionsMenu(menu);
     }
 
+    // --- ESTA É A VERSÃO CORRETA DA LÓGICA DE CLIQUE, AGORA DENTRO DA CLASSE ---
     @Override
     public void onChannelClick(Channel channel) {
-        Intent intent = new Intent(this, PlayerActivity.class);
-        intent.putExtra("channel_url", channel.getUrl());
-        intent.putExtra("channel_name", channel.getName());
-        startActivity(intent);
+        ArrayList<Channel> channelList = new ArrayList<>();
+        int clickedIndex = -1;
+
+        // Procura a categoria correspondente e a lista de canais dela
+        for (ChannelCategory category : categoryAdapter.getCategoryList()) {
+            if (category.getChannels().contains(channel)) {
+                channelList.addAll(category.getChannels());
+                break;
+            }
+        }
+
+        // Encontra o índice exato do canal clicado dentro da lista
+        for (int i = 0; i < channelList.size(); i++) {
+            // Compara por URL para garantir, pois objetos podem ser diferentes
+            if (channelList.get(i).getUrl().equals(channel.getUrl())) {
+                clickedIndex = i;
+                break;
+            }
+        }
+
+        if (!channelList.isEmpty() && clickedIndex != -1) {
+            Log.d(TAG, "Iniciando player com " + channelList.size() + " canais. Posição inicial: " + clickedIndex);
+            Intent intent = new Intent(this, PlayerActivity.class);
+            intent.putExtra("channel_list", channelList);
+            intent.putExtra("start_position", clickedIndex);
+            startActivity(intent);
+        } else {
+             Log.e(TAG, "Não foi possível encontrar o canal clicado na lista da categoria.");
+             // Fallback para o método antigo caso algo dê errado
+             Intent intent = new Intent(this, PlayerActivity.class);
+             intent.putExtra("channel_list", new ArrayList<Channel>(){{ add(channel); }});
+             intent.putExtra("start_position", 0);
+             startActivity(intent);
+        }
     }
 
     private List<Channel> downloadM3uContent(String m3uUrl) throws Exception {
@@ -207,7 +232,6 @@ public class ChannelListActivity extends AppCompatActivity implements ChannelAda
                     fetchedChannels.add(new Channel(currentChannelName, line.trim(), currentLogoUrl, currentGroup));
                     currentChannelName = null;
                     currentLogoUrl = null;
-                    // A LINHA INCORRETA FOI REMOVIDA DAQUI
                     currentGroup = null;
                 }
             }
