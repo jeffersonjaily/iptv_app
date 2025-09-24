@@ -34,12 +34,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Channel currentPlaylist = playlist.get(position);
         holder.nameTextView.setText(currentPlaylist.getName());
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onPlaylistClick(currentPlaylist);
-            }
-        });
     }
 
     @Override
@@ -48,13 +42,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     }
 
     public static class PlaylistViewHolder extends RecyclerView.ViewHolder {
-        ImageView iconImageView;
         TextView nameTextView;
 
         public PlaylistViewHolder(@NonNull View itemView) {
             super(itemView);
-            iconImageView = itemView.findViewById(R.id.channelImageView);
             nameTextView = itemView.findViewById(R.id.channelNameTextView);
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onPlaylistClick(playlist.get(position));
+                }
+            });
         }
     }
 }
