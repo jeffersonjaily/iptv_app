@@ -3,94 +3,71 @@ package com.seuprojeto;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.TextView; // Importação necessária
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.ArrayList;
+import com.bumptech.glide.Glide;
 import java.util.List;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
+public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelViewHolder> {
 
-    private List<ChannelCategory> categoryList;
-    private final List<ChannelCategory> originalCategoryList;
-    private final ChannelAdapter.OnChannelClickListener channelClickListener;
+    private List<Channel> channelList;
+    private OnChannelClickListener listener;
 
-    public CategoryAdapter(List<ChannelCategory> categoryList, ChannelAdapter.OnChannelClickListener channelClickListener) {
-        this.categoryList = new ArrayList<>(categoryList);
-        this.originalCategoryList = new ArrayList<>(categoryList);
-        this.channelClickListener = channelClickListener;
+    public interface OnChannelClickListener {
+        void onChannelClick(Channel channel);
+    }
+
+    public ChannelAdapter(List<Channel> channelList, OnChannelClickListener listener) {
+        this.channelList = channelList;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category_row, parent, false);
-        return new CategoryViewHolder(view);
+    public ChannelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_poster_card, parent, false);
+        return new ChannelViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        ChannelCategory category = categoryList.get(position);
-        holder.categoryTitle.setText(category.getTitle());
+    public void onBindViewHolder(@NonNull ChannelViewHolder holder, int position) {
+        Channel channel = channelList.get(position);
 
-        holder.channelsRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
-        ChannelAdapter channelAdapter = new ChannelAdapter(category.getChannels(), channelClickListener);
-        holder.channelsRecyclerView.setAdapter(channelAdapter);
+        // --- MUDANÇA 1: Define o texto do nome do canal ---
+        holder.channelName.setText(channel.getName());
+
+        if (channel.getLogoUrl() != null && !channel.getLogoUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                 .load(channel.getLogoUrl())
+                 .placeholder(R.mipmap.ic_launcher)
+                 .error(R.mipmap.ic_launcher)
+                 .into(holder.channelImage);
+        } else {
+            holder.channelImage.setImageResource(R.mipmap.ic_launcher);
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onChannelClick(channel);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return categoryList.size();
+        return channelList != null ? channelList.size() : 0;
     }
 
-    // Método de filtro para a busca por texto
-    public void filter(String text) {
-        categoryList.clear();
-        if (text.isEmpty()) {
-            categoryList.addAll(originalCategoryList);
-        } else {
-            text = text.toLowerCase();
-            for (ChannelCategory category : originalCategoryList) {
-                List<Channel> filteredChannels = new ArrayList<>();
-                for (Channel channel : category.getChannels()) {
-                    if (channel.getName().toLowerCase().contains(text)) {
-                        filteredChannels.add(channel);
-                    }
-                }
-                if (!filteredChannels.isEmpty() || category.getTitle().toLowerCase().contains(text)) {
-                    categoryList.add(new ChannelCategory(category.getTitle(), filteredChannels));
-                }
-            }
-        }
-        notifyDataSetChanged();
-    }
+    public static class ChannelViewHolder extends RecyclerView.ViewHolder {
+        ImageView channelImage;
+        TextView channelName; // --- MUDANÇA 2: Adiciona a referência do TextView ---
 
-    // --- MÉTODO FALTANTE ESTÁ AQUI ---
-    // Adicione este método para filtrar pelas abas de categoria
-    public void filterByCategory(String mainCategory) {
-        categoryList.clear();
-        if (mainCategory.equalsIgnoreCase("Todos")) {
-            categoryList.addAll(originalCategoryList);
-        } else {
-            for (ChannelCategory category : originalCategoryList) {
-                if (category.getTitle().trim().startsWith(mainCategory)) {
-                    categoryList.add(category);
-                }
-            }
-        }
-        notifyDataSetChanged();
-    }
-    // --- FIM DO MÉTODO FALTANTE ---
-
-    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
-        TextView categoryTitle;
-        RecyclerView channelsRecyclerView;
-
-        public CategoryViewHolder(@NonNull View itemView) {
+        public ChannelViewHolder(@NonNull View itemView) {
             super(itemView);
-            categoryTitle = itemView.findViewById(R.id.tv_category_title);
-            channelsRecyclerView = itemView.findViewById(R.id.rv_channels_horizontal);
+            channelImage = itemView.findViewById(R.id.iv_poster);
+            channelName = itemView.findViewById(R.id.tv_poster_title); // --- MUDANÇA 3: Pega o ID do TextView ---
         }
     }
 }
