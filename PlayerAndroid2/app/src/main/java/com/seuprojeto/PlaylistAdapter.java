@@ -24,7 +24,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         this.listener = listener;
     }
     
-    // Método adicionado para obter a lista de canais
     public List<Channel> getChannels() {
         return this.playlist;
     }
@@ -42,7 +41,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         holder.nameTextView.setText(currentPlaylist.getName());
 
         Glide.with(holder.itemView.getContext())
-                .load(R.drawable.ic_movie) // Carrega um ícone padrão, o que é correto para a lista de playlists
+                .load(R.drawable.ic_movie)
                 .into(holder.iconImageView);
 
         holder.itemView.setOnClickListener(v -> {

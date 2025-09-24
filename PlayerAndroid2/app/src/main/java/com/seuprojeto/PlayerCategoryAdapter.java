@@ -28,7 +28,7 @@ public class PlayerCategoryAdapter extends RecyclerView.Adapter<PlayerCategoryAd
         int oldPosition = this.selectedPosition;
         this.selectedPosition = position;
         notifyItemChanged(oldPosition);
-        notifyItemChanged(position); // Correção do erro: usa 'position'
+        notifyItemChanged(position);
     }
 
     @NonNull

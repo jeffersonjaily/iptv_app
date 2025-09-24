@@ -51,6 +51,8 @@ public class PlayerActivity extends AppCompatActivity implements PlayerOvelayLis
         rvCategoriesOverlay = findViewById(R.id.rvCategoriesOverlay);
         rvChannelsOverlay = findViewById(R.id.rvChannelsOverlay);
 
+        playerView.requestFocus();
+
         hideSystemUI();
     }
 
@@ -62,6 +64,11 @@ public class PlayerActivity extends AppCompatActivity implements PlayerOvelayLis
             overlayPanel.setVisibility(View.VISIBLE);
             updateOverlayLists();
         }
+    }
+
+    @Override
+    public boolean isOverlayVisible() {
+        return overlayPanel.getVisibility() == View.VISIBLE;
     }
 
     @Override
