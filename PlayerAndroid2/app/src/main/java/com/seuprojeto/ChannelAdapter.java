@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView; // Importação necessária
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -34,6 +35,9 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
     public void onBindViewHolder(@NonNull ChannelViewHolder holder, int position) {
         Channel channel = channelList.get(position);
 
+        // --- MUDANÇA 1: Define o texto do nome do canal ---
+        holder.channelName.setText(channel.getName());
+
         if (channel.getLogoUrl() != null && !channel.getLogoUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                  .load(channel.getLogoUrl())
@@ -58,10 +62,12 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ChannelV
 
     public static class ChannelViewHolder extends RecyclerView.ViewHolder {
         ImageView channelImage;
+        TextView channelName; // --- MUDANÇA 2: Adiciona a referência do TextView ---
 
         public ChannelViewHolder(@NonNull View itemView) {
             super(itemView);
             channelImage = itemView.findViewById(R.id.iv_poster);
+            channelName = itemView.findViewById(R.id.tv_poster_title); // --- MUDANÇA 3: Pega o ID do TextView ---
         }
     }
 }
