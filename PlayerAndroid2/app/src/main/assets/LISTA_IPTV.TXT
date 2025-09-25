@@ -1,6 +1,6 @@
 ---
 Nome: Series-Filmes- tem que Pesquisar
-http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus  
+Link M3U: http://kinder5.live:80/get.php?username=707434249&password=697551514&type=m3u_plus  
 ---
 Nome: Canais-ao-vivo
 Link M3U: http://felas87dz.icu:80/get.php?username=155846650&password=817126985&type=m3u_plus
