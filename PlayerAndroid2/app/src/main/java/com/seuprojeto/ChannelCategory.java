@@ -1,8 +1,9 @@
 package com.seuprojeto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ChannelCategory {
+public class ChannelCategory implements Serializable {
     private String title;
     private List<Channel> channels;
 

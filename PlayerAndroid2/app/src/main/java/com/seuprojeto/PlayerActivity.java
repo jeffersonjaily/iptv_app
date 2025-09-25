@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
@@ -16,7 +15,6 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,8 +49,6 @@ public class PlayerActivity extends AppCompatActivity implements PlayerOvelayLis
         rvCategoriesOverlay = findViewById(R.id.rvCategoriesOverlay);
         rvChannelsOverlay = findViewById(R.id.rvChannelsOverlay);
 
-        playerView.requestFocus();
-
         hideSystemUI();
     }
 
@@ -64,11 +60,6 @@ public class PlayerActivity extends AppCompatActivity implements PlayerOvelayLis
             overlayPanel.setVisibility(View.VISIBLE);
             updateOverlayLists();
         }
-    }
-
-    @Override
-    public boolean isOverlayVisible() {
-        return overlayPanel.getVisibility() == View.VISIBLE;
     }
 
     @Override
@@ -174,16 +165,7 @@ public class PlayerActivity extends AppCompatActivity implements PlayerOvelayLis
             onCategoryClick("TODOS", 0);
         }
         
-        rvChannelsOverlay.post(() -> {
-            if (rvChannelsOverlay.getAdapter() != null) {
-                PlaylistAdapter adapter = (PlaylistAdapter) rvChannelsOverlay.getAdapter();
-                List<Channel> filteredChannels = adapter.getChannels();
-                int indexInFilteredList = filteredChannels.indexOf(currentChannel);
-                if (indexInFilteredList != -1) {
-                    rvChannelsOverlay.scrollToPosition(indexInFilteredList);
-                }
-            }
-        });
+        rvChannelsOverlay.scrollToPosition(allChannels.indexOf(currentChannel));
     }
 
     private void releasePlayer() {

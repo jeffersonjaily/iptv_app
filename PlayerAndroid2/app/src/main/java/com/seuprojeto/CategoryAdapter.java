@@ -12,13 +12,15 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<ChannelCategory> categoryList;
+    private List<ChannelCategory> visibleCategoryList;
     private final List<ChannelCategory> originalCategoryList;
     private final ChannelAdapter.OnChannelClickListener channelClickListener;
+    private String currentTextQuery = "";
+    private String currentCategoryFilter = "Todos";
 
     public CategoryAdapter(List<ChannelCategory> categoryList, ChannelAdapter.OnChannelClickListener channelClickListener) {
-        this.categoryList = new ArrayList<>(categoryList);
         this.originalCategoryList = new ArrayList<>(categoryList);
+        this.visibleCategoryList = new ArrayList<>(categoryList);
         this.channelClickListener = channelClickListener;
     }
 
@@ -31,9 +33,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        ChannelCategory category = categoryList.get(position);
+        ChannelCategory category = visibleCategoryList.get(position);
         holder.categoryTitle.setText(category.getTitle());
-
         holder.channelsRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         ChannelAdapter channelAdapter = new ChannelAdapter(category.getChannels(), channelClickListener);
         holder.channelsRecyclerView.setAdapter(channelAdapter);
@@ -41,50 +42,54 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public int getItemCount() {
-        return categoryList.size();
+        return visibleCategoryList.size();
     }
 
     public void filter(String text) {
-        categoryList.clear();
-        if (text.isEmpty()) {
-            categoryList.addAll(originalCategoryList);
-        } else {
-            text = text.toLowerCase();
-            for (ChannelCategory category : originalCategoryList) {
-                List<Channel> filteredChannels = new ArrayList<>();
-                for (Channel channel : category.getChannels()) {
-                    if (channel.getName().toLowerCase().contains(text)) {
-                        filteredChannels.add(channel);
-                    }
-                }
-                if (!filteredChannels.isEmpty() || category.getTitle().toLowerCase().contains(text)) {
-                    categoryList.add(new ChannelCategory(category.getTitle(), filteredChannels));
-                }
-            }
-        }
-        notifyDataSetChanged();
+        this.currentTextQuery = text;
+        applyFilters();
     }
 
     public void filterByCategory(String mainCategory) {
-        categoryList.clear();
-        if (mainCategory.equalsIgnoreCase("Todos")) {
-            categoryList.addAll(originalCategoryList);
+        this.currentCategoryFilter = mainCategory;
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        List<ChannelCategory> tempFilteredList = new ArrayList<>();
+        if (currentCategoryFilter.equalsIgnoreCase("Todos")) {
+            tempFilteredList.addAll(originalCategoryList);
         } else {
             for (ChannelCategory category : originalCategoryList) {
-                if (category.getTitle().trim().startsWith(mainCategory)) {
-                    categoryList.add(category);
+                if (category.getTitle().trim().startsWith(currentCategoryFilter)) {
+                    tempFilteredList.add(category);
+                }
+            }
+        }
+
+        visibleCategoryList.clear();
+        if (currentTextQuery.isEmpty()) {
+            visibleCategoryList.addAll(tempFilteredList);
+        } else {
+            String searchText = currentTextQuery.toLowerCase();
+            for (ChannelCategory category : tempFilteredList) {
+                List<Channel> filteredChannelsByName = new ArrayList<>();
+                for (Channel channel : category.getChannels()) {
+                    if (channel.getName().toLowerCase().contains(searchText)) {
+                        filteredChannelsByName.add(channel);
+                    }
+                }
+                if (!filteredChannelsByName.isEmpty() || category.getTitle().toLowerCase().contains(searchText)) {
+                    visibleCategoryList.add(new ChannelCategory(category.getTitle(), filteredChannelsByName));
                 }
             }
         }
         notifyDataSetChanged();
     }
 
-    // --- MÉTODO FALTANTE ADICIONADO AQUI ---
     public List<ChannelCategory> getCategoryList() {
-        // Retorna a lista original para garantir que temos todos os canais para passar para o player
         return originalCategoryList;
     }
-    // ------------------------------------
 
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView categoryTitle;

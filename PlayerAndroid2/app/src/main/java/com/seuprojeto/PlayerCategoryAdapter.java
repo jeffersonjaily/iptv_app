@@ -1,11 +1,11 @@
 package com.seuprojeto;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
@@ -25,33 +25,33 @@ public class PlayerCategoryAdapter extends RecyclerView.Adapter<PlayerCategoryAd
     }
 
     public void setSelectedPosition(int position) {
-        int oldPosition = this.selectedPosition;
+        int oldPosition = selectedPosition;
         this.selectedPosition = position;
         notifyItemChanged(oldPosition);
-        notifyItemChanged(position);
+        notifyItemChanged(selectedPosition);
     }
 
     @NonNull
     @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         return new CategoryViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         String category = categories.get(position);
-        holder.categoryTextView.setText(category);
-
+        holder.textView.setText(category);
+        
         if (position == selectedPosition) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.selected_category_bg));
+            holder.itemView.setBackgroundColor(Color.parseColor("#E50914")); // Cor de destaque
         } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.transparent));
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
         }
-
+        
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onCategoryClick(category, position);
+                listener.onCategoryClick(category, holder.getAdapterPosition());
             }
         });
     }
@@ -62,11 +62,13 @@ public class PlayerCategoryAdapter extends RecyclerView.Adapter<PlayerCategoryAd
     }
 
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
-        TextView categoryTextView;
-
+        TextView textView;
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            categoryTextView = itemView.findViewById(R.id.categoryNameTextView);
+            textView = itemView.findViewById(android.R.id.text1);
+            textView.setTextColor(Color.WHITE);
+            textView.setPadding(20, 20, 20, 20);
+            textView.setTextSize(16f);
         }
     }
 }
